@@ -1,7 +1,6 @@
-
-  
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,8 +8,8 @@
     <title>Book Search</title>
     <link rel="stylesheet" href="/styles/reset.css">
     <link rel="stylesheet" href="/styles/style.css">
-
 </head>
+
 <body>
     <header>
         <h1>Best Books!</h1>
@@ -21,27 +20,31 @@
         </nav>
     </header>
     <main>
-        <br>
         <h2>Search By Title Or Author</h2>
-        <br>
         <form action="/searches" method="POST">
             <fieldset>
-            <input type="text" required placeholder="Enter a Title or Author" name="one">
+                <input type="text" required placeholder="Enter a Title or Author" name="one">
+            </fieldset>
             <br>
-            <label for="title">Title</label>
-            <input type="radio" value="intitle" id="title" name="one" checked>
+            <fieldset class="radio">
+                <label for="title">Title</label>
+                <input type="radio" value="intitle" id="title" name="one" checked>
+            </fieldset>
             <br>
-            <label for="author">Author</label>
-            <input type="radio" value="inauthor" id="author" name="one">
-            <br>          
-            <input type="submit" id="submit" value="Search The Google Books API">
-        </fieldset>
+            <fieldset class="radio">
+                <label for="author">Author</label>
+                <input type="radio" value="inauthor" id="author" name="one">
+            </fieldset>
+            <br>
+            <fieldset>
+                <input type="submit" id="submit" value="Search The Google Books API">
+            </fieldset>
         </form>
     </main>
     <footer>
 
     </footer>
-    
-</body>
-</html>
 
+</body>
+
+</html>
