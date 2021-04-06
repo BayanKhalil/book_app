@@ -1,8 +1,37 @@
-  <p>Go Back to <a href="/">Main Page</a></p>
-    <section>
-        <img src="<%= myBooks.image_url%>" alt="">
-        <h4><%= myBooks.title%></h4>
-        <h5><%= myBooks.author%></h5>
-        <p><%= myBooks.description%></p>
-        <p><%= myBooks.isbn%> </p>  
-    </section>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>details</title>
+    <link rel="stylesheet" href="/styles/reset.css">
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+<body>
+    <header>
+
+        <%- include('./header') %>
+    </header>
+    <main>
+        
+        <section>
+            <img src="<%= myBooks.image_url%>" alt="">
+            <h4><%= myBooks.title%></h4>
+            <h5><%= myBooks.author%></h5>
+            <p><%= myBooks.description%></p>
+            <p><%= myBooks.isbn%> </p>  
+            <button onclick="formShow()">Update</button>
+            <%- include('./edit') %>
+            <form action="/books/details/<%= myBooks.id%>?_method=DELETE" method="POST">
+                <input type="hidden" value="<%= myBooks.id%>">
+                <button type="submit">Delete</button>
+            </form>
+        </section>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
+

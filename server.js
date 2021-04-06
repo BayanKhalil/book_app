@@ -5,38 +5,59 @@ require('dotenv').config();
 const express = require('express');
 // const { Console } = require('node:console');
 const superagent = require('superagent');
-const app = express();
 const pg = require('pg');
+const methodoverride = require('method-override');
+const app = express();
 const client = new pg.Client(process.env.DATABASE_URL)
 app.set('view engine', 'ejs');
 const PORT = process.env.PORT;
 app.use(express.static('./public/'));
-app.use(express.urlencoded({ extended: true }))
-// app.use(express.static('public/styles/'));
+app.use(express.urlencoded({extended : true}))
+app.use(methodoverride('_method'));
 
-app.get('/test', (req, res) => {
+
+app.get('/test', (req, res)=> {
     res.render('pages/index')
 })
-app.get('/', (req, res) => {
+app.get('/', (req, res)=> {
     let SQL = 'SELECT * FROM books';
     client.query(SQL).then(response => {
         let result = response.rows;
         let count = result.length;
-        res.render('pages/index', { myBooks: result, num: count })
+        res.render('pages/index', {myBooks: result, num: count})
     })
 })
-app.get('/books/details/:id', (req, res) => {
+app.get('/books/details/:id', (req,res)=>{
     let SQL = 'SELECT * FROM books WHERE id=$1';
     let ids = req.params.id;
-    client.query(SQL, [ids]).then(response => {
+    client.query(SQL,[ids]).then(response => {
         let result = response.rows[0];
-        console.log(result)
-        res.render('pages/searches/detail', { myBooks: result })
+        // console.log(result)
+        res.render('pages/searches/detail', {myBooks: result})
     })
-
+    
+})
+app.put('/books/details/:id', (req,res)=>{
+    let id = req.params.id;
+    let SQL = 'UPDATE books SET title=$1, author=$2, description=$3, image_url=$4, isbn=$5 WHERE id=$6';
+    const {title, description, author, isbn, img} = req.body;
+    console.log(title,'---------', description, author, isbn, '-------------',img)
+    let values = [title,author,description,img,isbn,id];
+    client.query(SQL,values).then(result => {
+        console.log('___________________________',result);
+        res.redirect(`/books/details/${id}`);
+    })
+})
+app.delete('/books/details/:id', (req,res)=>{
+    let id = req.params.id;
+    let SQL = 'DELETE FROM books WHERE id=$1';
+    client.query(SQL,[id]).then(result => {
+        console.log(result);
+        res.redirect('/');
+    })
 })
 let bookArr = [];
-function Book(t, a, d, src, isbn) {
+function Book(t,a,d,src,isbn){
     this.title = t || 'No title available';
     this.author = a || 'no author available';
     this.des = d || 'no description available';
@@ -44,83 +65,82 @@ function Book(t, a, d, src, isbn) {
     this.type = isbn || 'No isbn available';
     bookArr.push(this)
 }
-app.get('/searches/new', (req, res) => {
+app.get('/searches/new', (req,res) => {
     res.render('pages/searches/new')
 })
 app.post('/searches', (req, res) => {
-
+    
     let info = req.body.one;
     let url = `https://www.googleapis.com/books/v1/volumes?q=${info[0]}+${info[1]}`;
-    superagent.get(url).then(result => {
+    superagent.get(url).then( result => {
         let books = result.body.items;
+        
+        if(result.body.totalItems){
+        books.forEach(element => {
+            
+            let reg = /https/gi;
+            let title = element.volumeInfo.title;
+            let author = ''
+            if(element.volumeInfo.authors){
+            author = element.volumeInfo.authors.join(' + ');
+            }else{
+                author = 'no author available'
+            }
+            let des = element.volumeInfo.description;
+            let str = element.volumeInfo.imageLinks.smallThumbnail;
+            let type2 = element.volumeInfo.industryIdentifiers;
+            let type = '';
+            if(type2){
+                type = type2[0].type
+            }else{
+                type = 'OTHER'
+            }
+            if(reg.test(str)){
+                
+            let newBook = new Book(title, author, des,str, type );
+            }else{
+                
+                let str2 = str.replace('http://','https://')
+                let newBook = new Book(title, author, des,str2, type );
+                
 
-        if (result.body.totalItems) {
-            books.forEach(element => {
-
-                let reg = /https/gi;
-                let title = element.volumeInfo.title;
-                let author = ''
-                if (element.volumeInfo.authors) {
-                    author = element.volumeInfo.authors.join(' + ');
-                } else {
-                    author = 'no author available'
-                }
-                let des = element.volumeInfo.description;
-                let str = element.volumeInfo.imageLinks.smallThumbnail;
-                let type2 = element.volumeInfo.industryIdentifiers;
-                let type = '';
-                if (type2) {
-                    type = type2[0].type
-                } else {
-                    type = 'OTHER'
-                }
-                if (reg.test(str)) {
-
-                    let newBook = new Book(title, author, des, str, type);
-                } else {
-
-                    let str2 = str.replace('http://', 'https://')
-                    let newBook = new Book(title, author, des, str2, type);
-
-
-                }
-            });
-        } else {
+            }
+        });}else {
             new Book()
         }
-
-
-        res.render('pages/searches/show', { myBooks: bookArr })
+    
+        
+        res.render('pages/searches/show', {myBooks: bookArr})
     })
 })
-app.post('/', (req, res) => {
+app.post('/', (req,res)=>{
     let info = req.body.two;
-
-    let values = [info[2], info[1], info[4], info[0], info[3]];
+    
+    let values = [info[2],info[1],info[4],info[0],info[3]];
     let SQL = 'INSERT INTO books (author, title, isbn, image_url, description) VALUES ( $1, $2, $3, $4, $5) RETURNING *';
-
-    client.query(SQL, values).then((y) => {
+    
+    client.query(SQL, values).then( (y)=> {
         console.log(y.rows)
         let n = y.rows[0].id;
         res.redirect(`/books/details/${n}`)
     }).catch(err => {
         console.log(err)
     })
-
+    
 })
 app.use('*', notFoundHandler); // 404 not found url
-
+ 
 app.use(errorHandler);
 
 function notFoundHandler(request, response) {
-    response.status(404).sendFile('./error', { root: './pages' })
+  response.status(404).sendFile('./error', {root : './pages'})
 }
 
 function errorHandler(err, request, response, next) {
-    response.status(500).render('pages/error');
+  response.status(500).render('pages/error');
 }
 // book image author title isbn description
-client.connect().then(() => {
+client.connect().then(()=>{
 
-    app.listen(PORT, () => console.log(`I'm using ${PORT} port`))
+    app.listen(PORT , ()=> console.log(`I'm using ${PORT} port`))
 })
