@@ -25,9 +25,11 @@ p{
 
 }
 form{
-	background-color: rgb(75, 39, 97);
+	background-color: rgb(119, 14, 122);
 	text-align: center;
 	height: 50%;
+	width: 20%;
+	margin-left: 40%;
 
 }
 footer{
@@ -63,7 +65,14 @@ footer{
 		background-color: rgb(182, 143, 17);
 		text-align: center;
 		height: 50%;
+		width: 50%;
+		margin-left: 25%;
 	
+	}
+	section{
+		display: block;
+		text-align: center;
+		/* margin-top: 50%; */
 	}
 
 }

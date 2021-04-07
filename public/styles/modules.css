@@ -1,6 +1,15 @@
 label{
-    height: 70%;
+    height: 100%;
 }
 input{
     text-align: center;
+}
+section button{
+    height: 100%;
+    margin-top: 5%;
+}
+section{
+    display: block;
+    text-align: center;
+    margin-top: 30%;
 }
