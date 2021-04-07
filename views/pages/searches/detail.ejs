@@ -19,14 +19,15 @@
         <section>
             <img src="<%= myBooks.image_url%>" alt="">
             <h4><%= myBooks.title%></h4>
-            <h5><%= myBooks.author%></h5>
+            <h5><%= myBooks.name%></h5>
             <p><%= myBooks.description%></p>
             <p><%= myBooks.isbn%> </p>  
             <button onclick="formShow()">Update</button>
             <%- include('./edit') %>
             <form action="/books/details/<%= myBooks.id%>?_method=DELETE" method="POST">
                 <input type="hidden" value="<%= myBooks.id%>">
-                <button type="submit">Delete</button>
+                 <br>
+                <button type="submit" >Delete</button>
             </form>
         </section>
     </main>
@@ -34,4 +35,3 @@
     <script src="/js/app.js"></script>
 </body>
 </html>
-
